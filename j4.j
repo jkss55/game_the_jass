@@ -24,7 +24,7 @@ library MyToollibrary initializer setorigin
     endglobals
 
     function interface ProjectileBack takes unit hero, unit u, integer ID, real x, real y returns nothing
-
+    //JACK进行注释
     function stsound takes unit u, string s1 returns nothing
         local sound s = CreateSound(s1, false, false, true, 5, 5, "Default")
         local real x = GetUnitX(u)
