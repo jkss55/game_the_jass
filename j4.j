@@ -26,6 +26,7 @@ library MyToollibrary initializer setorigin
     function interface ProjectileBack takes unit hero, unit u, integer ID, real x, real y returns nothing
     //JACK进行注释
     //没的说，土豆和洋芋
+    //这是一条新的修改注释，用来查看具体是怎么运作的。
     function stsound takes unit u, string s1 returns nothing
         local sound s = CreateSound(s1, false, false, true, 5, 5, "Default")
         local real x = GetUnitX(u)
