@@ -1,4 +1,5 @@
 library MyToollibrary initializer setorigin
+    //这是一条修改后添加的注释
     globals
         private hashtable Hash= InitHashtable()
         private timer T = CreateTimer() 
