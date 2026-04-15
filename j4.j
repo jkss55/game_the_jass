@@ -1644,6 +1644,7 @@ library MyToollibrary initializer setorigin
         //启动天灾
         static method StarDisaster takes unit u, real x,real y,ProjectileBack cb returns nothing
             local thistype d = thistype.allocate()
+            local thistype c = thistype.allocate()
             set d.x = x
             set d.y = y
             set d.cb = cb
@@ -1651,6 +1652,29 @@ library MyToollibrary initializer setorigin
             set d.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(d.t),0, d)
             call TimerStart(d.t, 0.7, true, function thistype.disaster)
+            set c.u = d.u
+            set c.Animationspeed[1] = 100
+            set c.AnimationID[1] = 6
+            set c.Animationspeed[2] = 50
+            set c.AnimationID[2] = 6 
+            set c.Animationspeed[3] = 50
+            set c.AnimationID[3] = 6
+            set c.Animationspeed[4] = 50
+            set c.AnimationID[4] = 6
+            set c.Animationspeed[5] = 100
+            set c.AnimationID[5] = 6
+            set c.Animationspeed[6] = 100
+            set c.AnimationID[6] = 0
+            set c.thetime[1] = 0.1
+            set c.thetime[2] = 4
+            set c.thetime[3] = 4
+            set c.thetime[4] = 5
+            set c.thetime[5] = 3
+            set c.thetime[6] = 0.1
+            set c.max = 6
+            set c.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(c.t),0, c)
+            call TimerStart(c.t, 0.01, false, function thistype.next)
         endmethod
 
     endstruct
