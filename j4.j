@@ -1,5 +1,4 @@
 library MyToollibrary initializer setorigin
-    //这是一条修改后添加的注释
     globals
         private hashtable Hash= InitHashtable()
         private timer T = CreateTimer() 
@@ -24,10 +23,7 @@ library MyToollibrary initializer setorigin
     endglobals
 
     function interface ProjectileBack takes unit hero, unit u, integer ID, real x, real y returns nothing
-    //JACK进行注释
-    //没的说，土豆和洋芋
-    //这是一条新的修改注释，用来查看具体是怎么运作的。
-    //土豆再次更改
+
     function stsound takes unit u, string s1 returns nothing
         local sound s = CreateSound(s1, false, false, true, 5, 5, "Default")
         local real x = GetUnitX(u)
@@ -519,6 +515,7 @@ library MyToollibrary initializer setorigin
         unit ua
         unit ub
         effect ef
+        lightning l
         real AF
         real AFmax
         real AFConstant
@@ -1027,14 +1024,14 @@ library MyToollibrary initializer setorigin
                     call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_zj_hl.mdx",x,y))
                     set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg_sword_hong.mdx", x,y, d.angle,130,0,5,-1,100)
                     call SetUnitUserData(d.ub,50)
-                    call Projectile.SetMove(d.ub,1500,20,0.5,150,d.angle,0,0,"Abilities\\Spells\\Undead\\OrbOfDeath\\OrbOfDeathMissile.mdl",-1,'A006',d.u,d.cb)
+                    call Projectile.SetMove(d.ub,1500,20,0.5,180,d.angle,0,0,"Abilities\\Spells\\Undead\\OrbOfDeath\\OrbOfDeathMissile.mdl",-1,'A006',d.u,d.cb)
                 endif
                 if d.i == 2 then
                     set timeA = 0.5
                     call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_jianqikuozhang.mdx",x,y))
                     set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_lansedaoguang.mdx", x,y, d.angle,230,0,5,-1,100)
                     call SetUnitUserData(d.ub,50)
-                    call Projectile.SetMove(d.ub,1500,20,0.5,150,d.angle,0,0,"Abilities\\Weapons\\ChimaeraLightningMissile\\ChimaeraLightningMissile.mdl",-1,'A006',d.u,d.cb)
+                    call Projectile.SetMove(d.ub,1500,20,0.5,180,d.angle,0,0,"Abilities\\Weapons\\ChimaeraLightningMissile\\ChimaeraLightningMissile.mdl",-1,'A006',d.u,d.cb)
                 endif
                 if d.i == 3 then
                     set timeA = 1.5
@@ -1051,7 +1048,7 @@ library MyToollibrary initializer setorigin
                         call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_zj_hl.mdx",d.nx,d.ny))
                         set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg_sword_hong.mdx", d.nx,d.ny, a,130,0,5,-1,100)
                         call SetUnitUserData(d.ub,50)
-                        call Projectile.SetMove(d.ub,1500,20,0.5,150,a,0,0,"Abilities\\Spells\\Undead\\OrbOfDeath\\OrbOfDeathMissile.mdl",-1,'A006',d.u,d.cb)
+                        call Projectile.SetMove(d.ub,1500,20,0.5,180,a,0,0,"Abilities\\Spells\\Undead\\OrbOfDeath\\OrbOfDeathMissile.mdl",-1,'A006',d.u,d.cb)
                         set i = i + 1
                     endloop
                 endif
@@ -1063,7 +1060,7 @@ library MyToollibrary initializer setorigin
                     call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl",d.nx,d.ny))
                     set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg1.mdx", d.nx,d.ny, a,150,0,5,-1,100)
                     call SetUnitUserData(d.ub,50)
-                    call Projectile.SetMove(d.ub,1500,20,0.5,80,a,0,0,"",-1,'A006',d.u,d.cb)
+                    call Projectile.SetMove(d.ub,1500,20,0.5,100,a,0,0,"",-1,'A006',d.u,d.cb)
                 endif
                 if d.i == 20 or d.i == 35 or d.i == 50 then
                     if d.i == 20 then
@@ -1083,7 +1080,7 @@ library MyToollibrary initializer setorigin
                         call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_jianqikuozhang.mdx",d.nx,d.ny))
                         set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg_sword_lan.mdx", d.nx,d.ny, a,120,0,5,-1,100)
                         call SetUnitUserData(d.ub,50)
-                        call Projectile.SetMove(d.ub,1500,15,0.5,150,a,0,0,"Abilities\\Weapons\\ChimaeraLightningMissile\\ChimaeraLightningMissile.mdl",-1,'A007',d.u,d.cb)
+                        call Projectile.SetMove(d.ub,1500,15,0.5,200,a,0,0,"Abilities\\Weapons\\ChimaeraLightningMissile\\ChimaeraLightningMissile.mdl",-1,'A007',d.u,d.cb)
                         set i = i + 1
                     endloop
                 endif
@@ -1526,17 +1523,17 @@ library MyToollibrary initializer setorigin
                         set i = i + 1
                     endloop
                 endif
-                if d.ID > 1 and d.ID < 6 then
-                    set a = 0.1
-                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "dw_xuesesishen.mdl", d.nextx,d.nexty, d.angle ,150,0,5,5,50)
-                    call SetUnitFlyHeight(d.ua, 300, 0)
-                    call Projectile.SetMove(d.ua,GetDistance(d.x,d.y,d.nextx,d.nexty),25,0,100,d.angle,0,1,"",0,'A012',d.u,0)
-                endif
                 if d.ID == 2 then
                     set a = 0.1
                     set d.nextx = GetUnitX(d.u)
                     set d.nexty = GetUnitY(d.u)
                     call Projectile.SetMove(d.u,GetDistance(d.x,d.y,GetUnitX(d.u),GetUnitY(d.u)),25,0,100,d.angle,0,0,"",0,'A012',d.u,d.cb)
+                endif
+                if d.ID > 1 and d.ID < 6 then
+                    set a = 0.1
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "dw_xuesesishen.mdl", d.nextx,d.nexty, d.angle ,150,0,5,5,50)
+                    call SetUnitFlyHeight(d.ua, 300, 0)
+                    call Projectile.SetMove(d.ua,GetDistance(d.x,d.y,d.nextx,d.nexty),25,0,100,d.angle,0,1,"",0,'A012',d.u,0)
                 endif
                 if d.ID == 1 then
                     set a = 0.7
@@ -1565,6 +1562,95 @@ library MyToollibrary initializer setorigin
             set d.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(d.t),0, d)
             call TimerStart(d.t, 0.1, false, function thistype.RedJump)
+        endmethod
+
+        //天灾
+        static method disaster takes nothing returns nothing
+            local timer t = GetExpiredTimer()
+            local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
+            local real i = 0
+            local real r = 0
+            local real a = 0
+            local real z = 2000
+            if d.ID >= 24 then
+                call DestroyLightning(d.l)
+                call d.DestroyAndTimer(t)
+            else
+                set d.ID = d.ID + 1
+                if d.ID == 1 then
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_longjuanfeng.mdl", d.x,d.y, 0,300,0,14,-1,30)
+                endif
+                if d.ID <= 4 then
+                    set d.ef = AddSpecialEffect("war3mapimported\\buff_xuli.mdx",d.x,d.y)
+                    call EXSetEffectSize( d.ef, 4)
+                    call DestroyEffect(d.ef)
+                endif
+                if d.ID >= 4 then
+                    set r =  GetRandomReal(300,600)
+                    set a =  GetRandomReal(0,360)
+                    set d.nextx = d.x + r * Cos(a * bj_DEGTORAD)
+                    set d.nexty = d.y + r * Sin(a * bj_DEGTORAD)
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_shuilongjuan.mdl", d.nextx,d.nexty, 0 ,110,0,5,-1,100)
+                    call SetUnitUserData(d.ua,50)
+                    call Projectile.SetMove(d.ua,600,3.5,0.5,180,a,0,0,"",-1,'AX13',d.u,d.cb)
+                endif
+                if d.ID >= 8 then
+                    set i = 0
+                    loop
+                        exitwhen i == 2
+                        set r =  GetRandomReal(500,1200)
+                        set a =  GetRandomReal(0,360)
+                        set d.nextx = d.x + r * Cos(a * bj_DEGTORAD)
+                        set d.nexty = d.y + r * Sin(a * bj_DEGTORAD)
+                        set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapImported\\buff_huoqiu.mdl", d.nextx,d.nexty, 180,40*GetRandomReal(0.7,1.3),0,4,-1,100)
+                        call SetUnitUserData(d.ua,50)
+                        call SetUnitFlyHeight(d.ua, 1500, 0)
+                        call Projectile.SetMove(d.ua,500,4,0,0,180,0,1,"",-150,'AC13',d.u,d.cb)
+                        set i = i + 1
+                    endloop
+                endif
+                if d.ID == 10 then
+                    call LensSettings.ShakyCamera(7,10)
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_orgia mode4.mdx", d.x,d.y, 0,400,0,8,-1,100)
+                endif
+                if d.ID == 12 then
+                    set i = 0
+                    loop
+                        exitwhen i == 3
+                        set d.nx = d.x + 450 * Cos((120*i) * bj_DEGTORAD)
+                        set d.ny = d.y + 450 * Sin((120*i) * bj_DEGTORAD)
+                        set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_leiyun.mdx", d.nx,d.ny, d.angle,700,50,8,-1,100)
+                        call SetUnitFlyHeight(d.ua, 1000, 0)
+                        set i = i + 1
+                    endloop
+                endif
+                if d.ID > 12 then
+                    set r =  GetRandomReal(500,1200)
+                    set a =  GetRandomReal(0,360)
+                    set d.nextx = d.x + r * Cos(a * bj_DEGTORAD)
+                    set d.nexty = d.y + r * Sin(a * bj_DEGTORAD)
+                    set d.nx = d.nextx + 300 * Cos(a * bj_DEGTORAD)
+                    set d.ny = d.nexty + 300 * Sin(a * bj_DEGTORAD)
+                    call DestroyLightning(d.l)
+                    set d.l = AddLightningEx("FORK",true,d.nx,d.ny,z,d.nextx,d.nexty,0)
+                    //call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_by_wood_effect_yubanmeiqin_lightning_zhenzhengdeluolei.mdx",d.nextx,d.nexty))
+                    call DestroyEffect(AddSpecialEffect("Abilities\\Weapons\\Bolt\\BoltImpact.mdl",d.nextx,d.nexty))
+                    call d.cb.evaluate(d.u, d.u, 'AD13', d.nextx,d.nexty)
+                endif
+            endif
+            set t = null
+        endmethod
+
+        //启动天灾
+        static method StarDisaster takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            set d.x = x
+            set d.y = y
+            set d.cb = cb
+            set d.u = u
+            set d.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(d.t),0, d)
+            call TimerStart(d.t, 0.7, true, function thistype.disaster)
         endmethod
 
     endstruct
