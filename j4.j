@@ -1367,7 +1367,7 @@ library MyToollibrary initializer setorigin
                     set d.nextx = d.x + 500 * Cos((d.angle + (i - (6 - 1) / 2.0) * 20) * bj_DEGTORAD)  
                     set d.nexty = d.y + 500 * Sin((d.angle + (i - (6 - 1) / 2.0) * 20) * bj_DEGTORAD)
                     call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_flamestrike blood ii.mdx",d.nextx,d.nexty))
-                    call d.cb.evaluate(d.u, null, '0000', d.nextx, d.nexty)
+                    call setGroup.BackEnemy(d.u,d.u,'A010',100,d.nextx,d.nexty,d.cb)
                     set i = i + 1
                 endloop
             endif
@@ -1573,11 +1573,13 @@ library MyToollibrary initializer setorigin
             local real a = 0
             local real z = 2000
             if d.ID >= 24 then
+                call PauseUnit( d.u, false)
                 call DestroyLightning(d.l)
                 call d.DestroyAndTimer(t)
             else
                 set d.ID = d.ID + 1
                 if d.ID == 1 then
+                    call PauseUnit( d.u, true)
                     set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_longjuanfeng.mdl", d.x,d.y, 0,300,0,14,-1,30)
                 endif
                 if d.ID <= 4 then
