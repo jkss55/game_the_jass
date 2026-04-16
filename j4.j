@@ -170,6 +170,40 @@ library MyToollibrary initializer setorigin
             set g = null
         endmethod
 
+        //返回直线范围敌人
+        static method LineEnemy takes unit u, unit hero, integer ID, real startX, real startY, real targetX, real targetY, real radius, ProjectileBack cb returns nothing
+            local real angle = GetAngleBetween(startX, startY, targetX, targetY)
+            local real dist = GetDistance(startX, startY, targetX, targetY)
+            local real step = radius * 0.75 
+            local real currentDist = 0
+            local real x
+            local real y
+            local group g = LoadGroupHandle(Hash, GetHandleId(u), existinggroup_t)
+            local boolean isNewGroup = false
+            if GetHandleId(g) == 0 then
+                set g = CreateGroup()
+                call SaveGroupHandle(Hash, GetHandleId(u), existinggroup_t, g)
+                set isNewGroup = true
+            endif
+            loop
+                exitwhen currentDist > dist
+                set x = startX + currentDist * Cos(angle * bj_DEGTORAD)
+                set y = startY + currentDist * Sin(angle * bj_DEGTORAD)
+                call setGroup.BackEnemy(u, hero, ID, radius, x, y, cb)
+                set currentDist = currentDist + step
+            endloop
+            set x = startX + dist * Cos(angle * bj_DEGTORAD)
+            set y = startY + dist * Sin(angle * bj_DEGTORAD)
+            call setGroup.BackEnemy(u, hero, ID, radius, x, y, cb)
+            if isNewGroup then
+                call DestroyGroup(g)
+                call RemoveSavedHandle(Hash, GetHandleId(u), existinggroup_t)
+            else
+                call GroupClear(g)
+            endif
+            set g = null
+        endmethod
+
         static method damagegroup takes unit u, real range, real x, real y, string s, real d, boolean t, attacktype at, damagetype dt, weapontype wt, group g1 returns nothing
             local unit u1
             local group g 
@@ -793,7 +827,7 @@ library MyToollibrary initializer setorigin
                 else
                     //执行能量聚集的部分
                     if d.i > 10 and d.i < 40 then
-                        call SetUnitScalePercent( d.ua, 100+(d.i*10), 200+(d.i*10), 200+(d.i*10) )
+                        call SetUnitScalePercent( d.ua, 200+(d.i*10), 200+(d.i*10), 200+(d.i*10) )
                     endif
                     set d.z = GetRandomReal(-radius, radius)
                     set r_xy = SquareRoot(radius * radius - d.z * d.z)
@@ -1002,7 +1036,6 @@ library MyToollibrary initializer setorigin
         static method SuperSlash takes nothing returns nothing
             local timer t = GetExpiredTimer()
             local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
-            local thistype c
             local real timeA = 0.5
             local real x = GetUnitX(d.u)
             local real y = GetUnitY(d.u)
@@ -1677,6 +1710,182 @@ library MyToollibrary initializer setorigin
             set c.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(c.t),0, c)
             call TimerStart(c.t, 0.01, false, function thistype.next)
+        endmethod
+
+        //执行能量爆发
+        static method EnergyBurst takes nothing returns nothing
+            local timer t = GetExpiredTimer()
+            local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
+            local real a = 0.1
+            local unit u 
+            local real x
+            local real y
+            local real r
+            if d.i >= 60 then
+                call KillUnit(d.ua)
+                call PauseUnit( d.u, false)
+                call d.DestroyAndTimer(t)
+            else
+                set d.i = d.i + 1
+                if d.i == 1 then
+                    call PauseUnit( d.u, true)
+                endif
+                if d.i <= 7 then
+                    set u = IllusionCreation(GetOwningPlayer(d.u), "yx_xiaoyuanxuli2.mdl", d.nx, d.ny, 0,300 ,0,2,-1,100)
+                    call SetUnitFlyHeight(u, 400 , 0)
+                endif
+                if d.i == 12 then
+                    call LensSettings.ShakyCamera(9,4.8)
+                    set d.ef = AddSpecialEffect("war3mapimported\\buff_yuanqidan.mdx",d.nx,d.ny)
+                    call EXSetEffectZ( d.ef, 300 )
+                    call EXSetEffectSize( d.ef, 3)
+                    call DestroyEffect(d.ef)
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_hdjg.mdx", d.nx,d.ny, d.angle,50,0,10,-1,70)
+                    call SetUnitFlyHeight(d.ua, 300, 0)   
+                endif
+                if d.i >= 12 then
+                    set r = GetRandomReal(1000,3000)
+                    set x = d.nx + 3000 * Cos(d.angle * bj_DEGTORAD)
+                    set y = d.ny + 3000 * Sin(d.angle * bj_DEGTORAD)
+                    call setGroup.LineEnemy(d.u,d.u,'A014',d.nx,d.ny,x,y,250,d.cb)
+                    set d.nextx = d.nx + r * Cos(d.angle * bj_DEGTORAD)
+                    set d.nexty = d.ny + r * Sin(d.angle * bj_DEGTORAD)
+                    set d.ID = d.ID + 1
+                    if d.ID >= 5 then
+                        set d.ID = 0
+                        set d.ef = AddSpecialEffect("war3mapimported\\buff_valkdust.mdx",GetUnitX(d.u),GetUnitY(d.u))
+                        call EXSetEffectSize( d.ef, 5)
+                        call DestroyEffect(d.ef)
+                        call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_hebao.mdx",d.nextx,d.nexty))
+                        call setGroup.BackEnemy(d.u,d.u,'A015',800,d.nextx,d.nexty,d.cb)
+                    endif
+                    set d.CheckID  = d.CheckID + 1
+                    if d.CheckID == 1 then
+                        set d.CheckID = 0
+                        set d.SignalID = d.SignalID + 1
+                        set d.angle = d.angle + 2.5
+                        set d.nx = GetUnitX(d.u) + 350 * Cos(d.angle * bj_DEGTORAD)
+                        set d.ny = GetUnitY(d.u) + 350 * Sin(d.angle * bj_DEGTORAD)
+                        call SetUnitFacing(d.u,d.angle)
+                        call SetUnitFacing(d.ua,d.angle)
+                        call SetUnitX(d.ua,d.nx)
+                        call SetUnitY(d.ua,d.ny)
+                    endif
+                endif
+                call TimerStart(t, a, false, function thistype.EnergyBurst)
+            endif
+            set t = null
+            set u = null
+        endmethod
+
+        //启动能量爆发
+        static method StarEnergyBurst takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            local thistype c = thistype.allocate()
+            set d.x = x
+            set d.y = y
+            set d.cb = cb
+            set d.u = u
+            set d.nx = GetUnitX(d.u)
+            set d.ny = GetUnitY(d.u)
+            set d.angle = GetAngleBetween(d.nx,d.ny,d.x,d.y)
+            set d.nx = d.nx + 350 * Cos(d.angle * bj_DEGTORAD)
+            set d.ny = d.ny + 350 * Sin(d.angle * bj_DEGTORAD)
+            set d.z = 200
+            set d.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(d.t),0, d)
+            call TimerStart(d.t, 0.1, false, function thistype.EnergyBurst)
+            set c.u = d.u
+            set c.Animationspeed[1] = 100
+            set c.AnimationID[1] = 4
+            set c.Animationspeed[2] = 30
+            set c.AnimationID[2] = -1 
+            set c.Animationspeed[3] = 100
+            set c.AnimationID[3] = 0
+            set c.thetime[1] = 0.5
+            set c.thetime[2] = 6
+            set c.thetime[3] = 0.1
+            set c.max = 3
+            set c.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(c.t),0, c)
+            call TimerStart(c.t, 0.1, false, function thistype.next)
+        endmethod
+
+        //扇形尖刺
+        static method spikes takes nothing returns nothing
+            local timer t = GetExpiredTimer()
+            local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
+            local real x = GetUnitX(d.u)
+            local real y = GetUnitY(d.u)
+            local real i = 0
+            local real a = 0
+            if d.i >= 10 then
+                loop
+                    exitwhen i == 12
+                    set a = d.angle + (15 * (i-5))
+                    set d.nx = x + 200 * Cos(a * bj_DEGTORAD)
+                    set d.ny = y + 200 * Sin(a * bj_DEGTORAD)
+                    call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl",d.nx,d.ny))
+                    set d.ub = IllusionCreation(GetOwningPlayer(d.u), "Abilities\\Weapons\\BristleBackMissile\\BristleBackMissile.mdl", d.nx,d.ny, a,450,0,5,-1,100)
+                    call SetUnitUserData(d.ub,50)
+                    call Projectile.SetMove(d.ub,1500,12,0.5,80,a,0,0,"Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdl",-1,'A016',d.u,d.cb)
+                    set i = i + 1
+                endloop
+                call PauseUnit( d.u, false)
+                call d.DestroyAndTimer(t)
+            else
+                loop
+                    exitwhen i == 2
+                    if i == 1 then
+                        set a = d.angle + (10 * d.i)
+                    else
+                        set a = d.angle - (10 * d.i)
+                    endif
+                    set d.nx = x + 200 * Cos(a * bj_DEGTORAD)
+                    set d.ny = y + 200 * Sin(a * bj_DEGTORAD)
+                    call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl",d.nx,d.ny))
+                    set d.ub = IllusionCreation(GetOwningPlayer(d.u), "Abilities\\Weapons\\BristleBackMissile\\BristleBackMissile.mdl", d.nx,d.ny, a,450,0,5,-1,100)
+                    call SetUnitUserData(d.ub,50)
+                    call Projectile.SetMove(d.ub,1500,12,0.5,80,a,0,0,"Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdl",-1,'A016',d.u,d.cb)
+                    set i = i + 1
+                endloop
+                set d.i = d.i + 1
+            endif
+            set t = null
+        endmethod
+
+        //启动扇形尖刺
+        static method StarSpikes takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            local thistype c = thistype.allocate()
+            set d.cb = cb
+            set d.u = u
+            set d.x = GetUnitX(d.u)
+            set d.y = GetUnitY(d.u)
+            set d.nextx = x
+            set d.nexty = y
+            set d.angle = GetAngleBetween(d.x,d.y,x,y)
+            set d.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(d.t),0, d)
+            call TimerStart(d.t, 0.2, true, function thistype.spikes)
+            call PauseUnit( d.u, true)
+            set c.u = d.u
+            set c.Animationspeed[1] = 150
+            set c.AnimationID[1] = 2
+            set c.Animationspeed[2] = 100
+            set c.AnimationID[2] = 3
+            set c.Animationspeed[3] = 100
+            set c.AnimationID[3] = 2
+            set c.Animationspeed[4] = 100
+            set c.AnimationID[4] = 0
+            set c.thetime[1] = 0.5
+            set c.thetime[2] = 1
+            set c.thetime[3] = 1
+            set c.thetime[4] = 0.1
+            set c.max = 4
+            set c.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(c.t),0, c)
+            call TimerStart(c.t, 0.1, false, function thistype.next)
         endmethod
 
     endstruct
