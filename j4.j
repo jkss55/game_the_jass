@@ -548,13 +548,14 @@ library MyToollibrary initializer setorigin
         unit u
         unit ua
         unit ub
+        unit array AllUnit[100]
         effect ef
         lightning l
         real AF
         real AFmax
         real AFConstant
         real Change
-        real array thetime[20]
+        real array thetime[50]
         real x
         real y
         real nx
@@ -566,7 +567,6 @@ library MyToollibrary initializer setorigin
         real ID = 0
         real CheckID = 0
         real SignalID = 0
-        real SpecialID
         real nextx
         real nexty
         real angle
@@ -1883,6 +1883,144 @@ library MyToollibrary initializer setorigin
             set c.thetime[3] = 1
             set c.thetime[4] = 0.1
             set c.max = 4
+            set c.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(c.t),0, c)
+            call TimerStart(c.t, 0.1, false, function thistype.next)
+        endmethod
+
+        //很多剑
+        static method ManySwords takes nothing returns nothing
+            local timer t = GetExpiredTimer()
+            local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
+            local real x = GetUnitX(d.u)
+            local real y = GetUnitY(d.u)
+            local integer i = 0
+            local real a = 0
+            local real Atime = 0.04
+            local real r
+            local integer Ri
+            local integer Moveif 
+            if d.ID > 3 and d.Countid == 0 then
+                call RemoveUnit(d.ub)
+                call d.DestroyAndTimer(t)
+            else
+                call SetUnitX(d.ub,x)
+                call SetUnitY(d.ub,y)
+                if d.i <= 24 and d.ID == 0 then
+                    set d.i = d.i + 1
+                    if d.i == 24 then
+                        set d.i = 0
+                        set d.ID = 1
+                    endif 
+                    set r = GetRandomReal(600,1000)
+                    set Atime = 0.06
+                    set a =  d.angle +  (d.i * 15)
+                    set d.nextx = x + 200 * Cos(a * bj_DEGTORAD)
+                    set d.nexty = y + 200 * Sin(a * bj_DEGTORAD)
+                    set d.nx = x + r * Cos(a * bj_DEGTORAD)
+                    set d.ny = y + r * Sin(a * bj_DEGTORAD)
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_anyinjian.mdl", d.nx,d.ny, a - 180,150,0,15,-1,100)
+                    call Projectile.SetMove(d.ua,GetDistance(d.nx,d.ny,d.nextx,d.nexty),25,0,80,GetAngleBetween(d.nx,d.ny,d.nextx,d.nexty),0,0,"",-1,'0000',d.u,0)
+                    set d.Countid = d.Countid + 1
+                    set d.AllUnit[d.Countid] = d.ua
+                    set d.thetime[d.Countid] = (d.i * 15)
+                endif
+                if d.i <= 24 and d.ID == 1 then
+                    set d.i = d.i + 1
+                    if d.i == 24 then
+                        set d.i = 0
+                        set d.ID = 2
+                    endif 
+                    set d.angle = d.angle + 3
+                    loop
+                        exitwhen i == d.Countid
+                        set i = i + 1
+                        set a = d.angle + (i * 15)
+                        set d.ua = d.AllUnit[i]
+                        set d.nextx = x + 200 * Cos(a * bj_DEGTORAD)
+                        set d.nexty = y + 200 * Sin(a * bj_DEGTORAD)
+                        call SetUnitX(d.ua,d.nextx)
+                        call SetUnitY(d.ua,d.nexty)
+                        call SetUnitFacing(d.ua,a)
+                    endloop
+                endif
+                if d.ID == 2 then
+                    set d.ID = 3
+                    set d.CheckID = 12
+                    set i = 0
+                    loop
+                        exitwhen i == d.Countid
+                        set i = i + 1
+                        set a = d.angle + (i * 15)
+                        set d.ua = d.AllUnit[i]
+                        call Projectile.SetMove(d.ua,1000,20,0.5,80,a,0,0,"",-1,'A017',d.u,d.cb)
+                    endloop
+                endif
+                if  d.ID == 3 then
+                    if d.CheckID <= 0 then
+                        set d.i = d.i + 1
+                        if d.i >= 24 then
+                            set d.ID = 4
+                            set d.i = 0
+                        endif
+                        set d.angle = d.angle + 3
+                        set i = 0
+                        loop
+                            exitwhen i == d.Countid
+                            set i = i + 1
+                            set a = d.angle + d.thetime[i]
+                            set d.ua = d.AllUnit[i]
+                            set d.nextx = x + 1200 * Cos(a * bj_DEGTORAD)
+                            set d.nexty = y + 1200 * Sin(a * bj_DEGTORAD)
+                            call SetUnitX(d.ua,d.nextx)
+                            call SetUnitY(d.ua,d.nexty)
+                            call SetUnitFacing(d.ua,a-180)
+                        endloop
+                    else
+                        set d.CheckID = d.CheckID - 1
+                    endif
+                endif
+                if  d.ID == 4 and d.Countid > 0 then
+                    set Atime = 0.12
+                    set Ri = GetRandomInt(1,d.Countid)
+                    set d.ua = d.AllUnit[Ri]
+                    set Moveif =LoadInteger(Hash, GetHandleId(d.ua), Projectileloop_t)
+                    if Moveif >= 0 then
+                        set d.i = d.i + 1
+                        if d.i >= 3 then
+                            set d.i = 0
+                            set d.ID = 3
+                        endif 
+                        call SetUnitUserData(d.ua,50)
+                        call Projectile.SetMove(d.ua,1000,30,0.5,80,GetAngleBetween(GetUnitX(d.ua),GetUnitY(d.ua),x,y),0,0,"",-1,'A017',d.u,d.cb)
+                        set d.AllUnit[Ri] = d.AllUnit[d.Countid]
+                        set d.thetime[Ri] = d.thetime[d.Countid]
+                        set d.Countid = d.Countid - 1
+                    endif
+                endif
+                call TimerStart(t, Atime, false, function thistype.ManySwords)
+            endif
+            set t = null
+        endmethod
+
+        //启动很多剑
+        static method StarManySwords takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            local thistype c = thistype.allocate()
+            set d.cb = cb
+            set d.u = u
+            set d.x = x
+            set d.y = y
+            set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_heilonghuanrao_gh.mdx", GetUnitX(d.u),GetUnitY(d.u), 0,650,50,15,-1,100)
+            set d.angle = GetAngleBetween(GetUnitX(d.u),GetUnitY(d.u),x,y)
+            set d.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(d.t),0, d)
+            call TimerStart(d.t, 0.01, false, function thistype.ManySwords)
+            set c.u = d.u
+            set c.Animationspeed[1] = 150
+            set c.AnimationID[1] = 7
+            set c.thetime[1] = 0.5
+            set c.max = 1
             set c.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(c.t),0, c)
             call TimerStart(c.t, 0.1, false, function thistype.next)
