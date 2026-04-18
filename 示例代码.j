@@ -37,3 +37,13 @@ function GetSpikes takes unit hero, unit u, integer ID, real x, real y returns n
         call BJDebugMsg("尖刺击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
     endif
 endfunction
+
+
+//启动很多剑
+call Skill.StarManySwords(GetTriggerUnit(),GetOrderPointX(), GetOrderPointY(),ProjectileBack.GetManySwords)
+//很多剑敌人捕获______________________________
+function GetManySwords takes unit hero, unit u, integer ID, real x, real y returns nothing 
+    if ID == 'A017' then
+        call BJDebugMsg("很多剑击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
+    endif
+endfunction
