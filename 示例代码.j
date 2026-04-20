@@ -47,3 +47,24 @@ function GetManySwords takes unit hero, unit u, integer ID, real x, real y retur
         call BJDebugMsg("很多剑击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
     endif
 endfunction
+
+
+//启动巨剑
+call Skill.StarGreatSword(GetTriggerUnit(),GetOrderPointX(), GetOrderPointY(),ProjectileBack.GetGreatSword)
+//巨剑敌人捕获______________________________
+function GetGreatSword takes unit hero, unit u, integer ID, real x, real y returns nothing 
+    //需要注意的是这个技能的剑相当密集，通常一次性会碰撞到4-5把剑左右。
+    if ID == 'A018' then
+        call BJDebugMsg("巨剑剑击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
+    endif
+endfunction
+
+
+//启动移动斩
+call Skill.StarInvincibleSlash(GetTriggerUnit(),GetOrderPointX(), GetOrderPointY(),ProjectileBack.GetInvincibleSlash)
+//移动斩敌人捕获______________________________
+function GetInvincibleSlash takes unit hero, unit u, integer ID, real x, real y returns nothing 
+    if ID == 'A019' then
+        call BJDebugMsg("移动斩击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
+    endif
+endfunction
