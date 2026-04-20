@@ -20,6 +20,7 @@ library MyToollibrary initializer setorigin
         private integer Projectileloop_t = StringHashBJ("Projectileloop")
         private integer Z_shapedSlash_t = StringHashBJ("Z_shapedSlash")
         private integer CircularBlood_t = StringHashBJ("CircularBlood")
+        private integer InvincibleSlash_t = StringHashBJ("InvincibleSlash")
     endglobals
 
     function interface ProjectileBack takes unit hero, unit u, integer ID, real x, real y returns nothing
@@ -716,6 +717,15 @@ library MyToollibrary initializer setorigin
             endif
             if ID == 'A012' and GetUnitTypeId(u) == 'ewsp' and GetUnitUserData(u) != 50 then
                 call RemoveUnit(u)
+            endif
+            if ID == 'A019' then
+                set d = LoadInteger(Hash, GetHandleId(u), InvincibleSlash_t)
+                if d != 0 and d.i > 0 then
+                    call d.InvincibleSlash()
+                endif
+                if GetUnitUserData(u) == 50 then
+                    call RemoveUnit(u)
+                endif
             endif
         endmethod
 
@@ -2024,6 +2034,139 @@ library MyToollibrary initializer setorigin
             set c.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(c.t),0, c)
             call TimerStart(c.t, 0.1, false, function thistype.next)
+        endmethod
+
+        //巨剑
+        static method GreatSword takes nothing returns nothing
+            local timer t = GetExpiredTimer()
+            local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
+            local real R = 150 + (d.i*50)
+            local real loopAngle
+            local real sideAngle
+            local real x = GetUnitX(d.u)
+            local real y = GetUnitY(d.u)
+            local real i = 0
+            if d.i >= 4 then
+                set d.i = 0
+                call d.DestroyAndTimer(t)
+            else
+                loop
+                    exitwhen i >= 360
+                    set loopAngle = i * bj_DEGTORAD
+                    set d.z = R * Sin(loopAngle)
+                    set sideAngle = (d.angle + 90.0) * bj_DEGTORAD
+                    set d.nextx = x + R * Cos(loopAngle) * Cos(sideAngle)
+                    set d.nexty = y + R * Cos(loopAngle) * Sin(sideAngle)
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_anyinjian.mdl", d.nextx,d.nexty, d.angle,150,0,15,-1,100)
+                    call SetUnitUserData(d.ua,50)
+                    call Projectile.SetMove(d.ua,2000,25,0.5,100,d.angle,0,0,"",-1,'A018',d.u,d.cb)
+                    call SetUnitFlyHeight(d.ua, 400 + d.z , 0)
+                    //set d.Countid = d.Countid + 1
+                    //set d.AllUnit[d.Countid] = d.ua
+                    set i = i + (360/22.5)
+                endloop
+                set d.i = d.i + 1
+            endif
+            set t = null
+        endmethod
+
+        //启动巨剑
+        static method StarGreatSword takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            local thistype c = thistype.allocate()
+            set d.cb = cb
+            set d.u = u
+            set d.x = x
+            set d.y = y
+            set d.angle = GetAngleBetween(GetUnitX(d.u),GetUnitY(d.u),x,y)
+            set d.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(d.t),0, d)
+            call TimerStart(d.t, 0.3, true, function thistype.GreatSword)
+            set c.u = d.u
+            set c.Animationspeed[1] = 150
+            set c.AnimationID[1] = 7
+            set c.thetime[1] = 0.5
+            set c.max = 1
+            set c.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(c.t),0, c)
+            call TimerStart(c.t, 0.1, false, function thistype.next)
+        endmethod
+
+        //移动斩 
+        method InvincibleSlash takes nothing returns nothing
+            local real a =GetRandomReal(0,360)
+            local real ox = GetUnitX(u)
+            local real oy = GetUnitY(u)
+            local real r1
+            local integer in = 0
+            local real r
+            if i <= 2 then
+                loop
+                    exitwhen in == Countid
+                    set in = in + 1
+                    set ua = AllUnit[in]
+                    set ox = GetUnitX(ua)
+                    set oy = GetUnitY(ua)
+                    call SetUnitUserData(ua,50)
+                    call SetUnitAnimationByIndex( ua, 9 )
+                    call SetUnitTimeScalePercent(ua,200)
+                    call Projectile.SetMove(ua,GetDistance(ox,oy,x,y),70,0.5,120,GetAngleBetween(ox,oy,x,y),0,0,"",-1,'A019',u,cb)
+                    set r1 = GetDistance(ox,oy,x,y)/2
+                    set angle = GetAngleBetween(ox,oy,x,y)
+                    set nextx = GetUnitX(ua) + r1 * Cos(angle * bj_DEGTORAD)
+                    set nexty = GetUnitY(ua) + r1 * Sin(angle * bj_DEGTORAD)
+                    set ub = IllusionCreation(GetOwningPlayer(u), "zhanji-blue.mdx", nextx,nexty, angle+90,60,0,1,-1,60)
+                    set ub = IllusionCreation(GetOwningPlayer(u), "war3mapimported\\buff_baici.mdl", nextx,nexty, angle,130,0,1,-1,100)
+                endloop
+                call PauseUnit( u, false)
+                call SetUnitTimeScalePercent(u,100)
+                call RemoveSavedInteger(Hash, GetHandleId(this.u), InvincibleSlash_t)
+                call this.DestroyAndTimer(null)
+            else
+                set i = i - 1
+                if i == 17 then
+                    set r = 1
+                else
+                    set r = 2
+                endif
+                if ID == 0 then
+                    set ID = 1
+                    set r1 = GetDistance(ox,oy,x,y)/2
+                    set angle = GetAngleBetween(ox,oy,x,y)
+                    set nextx = GetUnitX(u) + r1 * Cos(angle * bj_DEGTORAD)
+                    set nexty = GetUnitY(u) + r1 * Sin(angle * bj_DEGTORAD)
+                    set ub = IllusionCreation(GetOwningPlayer(u), "zhanji-blue.mdx", nextx,nexty, angle+90,60,0,1,-1,60)
+                    set ub = IllusionCreation(GetOwningPlayer(u), "war3mapimported\\buff_baici.mdl", nextx,nexty, angle,130,0,1,-1,100)
+                    call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_zj_hl.mdx",ox,oy))
+                    call SetUnitFlyHeight(ua, 100, 0)
+                    call Projectile.SetMove(u,GetDistance(ox,oy,x,y) * r,75,0.5,120,GetAngleBetween(ox,oy,x,y),0,0,"",-1,'A019',u,cb)
+                    set ua = IllusionCreation(GetOwningPlayer(u), "dw_shenjianzunzhu.mdl", ox,oy, angle,100,50,20,9,25)
+                    set Countid = Countid + 1
+                    set AllUnit[Countid] = ua
+                else
+                    set ID = 0
+                    set nextx = x + 800 * Cos(a * bj_DEGTORAD)
+                    set nexty = y + 800 * Sin(a * bj_DEGTORAD)
+                    call SetUnitAnimationByIndex( u, 9 )
+                    call Projectile.SetMove(u, GetDistance(ox,oy,nextx,nexty), 70, 0, 0, GetAngleBetween(ox,oy,nextx,nexty), 0, 0, "", -1, 'A019', u, 0)
+                endif
+            endif
+        endmethod
+        //启动移动斩
+        static method StarInvincibleSlash takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            set d.u = u
+            set d.x = x
+            set d.y = y
+            set d.nx = GetUnitX(d.u)
+            set d.ny = GetUnitY(d.u)
+            set d.angle = GetAngleBetween(d.nx,d.ny,d.x,d.y)
+            set d.cb = cb
+            set d.i = 18
+            call PauseUnit(u, true)
+            call SetUnitTimeScalePercent(u,600)
+            call SaveInteger(Hash, GetHandleId(u),InvincibleSlash_t, d)
+            call d.InvincibleSlash()
         endmethod
 
     endstruct
