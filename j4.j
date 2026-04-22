@@ -556,7 +556,7 @@ library MyToollibrary initializer setorigin
         real AFmax
         real AFConstant
         real Change
-        real array thetime[50]
+        real array thetime[100]
         real x
         real y
         real nx
@@ -576,9 +576,9 @@ library MyToollibrary initializer setorigin
         real initialSize
         real TargetSize
         real SpeedSize
-        real array AnimationMax[20] 
-        real array Animationspeed[20]
-        integer array AnimationID[20]
+        real array AnimationMax[100] 
+        real array Animationspeed[100]
+        integer array AnimationID[100]
         integer Countid
         real max
         integer SkillID
@@ -682,6 +682,7 @@ library MyToollibrary initializer setorigin
                 call c.DestroyAndTimer(t)
                 //call BJDebugMsg("结束运行")
             endif
+            set t = null
         endmethod
 
         //创建单位的函数 
@@ -852,6 +853,8 @@ library MyToollibrary initializer setorigin
                 endif
             endif
             set u = null
+            set t = null
+            set t1 = null
         endmethod
 
         //启动哥斯拉技能的函数,只需传入x,y,角度,单位
@@ -898,6 +901,7 @@ library MyToollibrary initializer setorigin
             endif
             set d.i = d.i + 1
             set u = null
+            set t = null
             if d.i >= d.max then
                 call d.DestroyAndTimer(t)
             endif
@@ -1129,6 +1133,7 @@ library MyToollibrary initializer setorigin
                 endif
                 call TimerStart(t,timeA, false, function thistype.SuperSlash)
             endif
+            set t = null
         endmethod
 
         //启动超级斩击的函数
@@ -1383,6 +1388,7 @@ library MyToollibrary initializer setorigin
             else
                 call TimerStart(t, a, false, function thistype.CircularImpact)
             endif
+            set t = null
         endmethod
 
         //启动环形冲击的函数
@@ -1431,6 +1437,7 @@ library MyToollibrary initializer setorigin
             else
                 set d.ID = d.ID + 1
             endif
+            set t = null
         endmethod
 
         //启动扇形冲击的函数
@@ -2167,6 +2174,119 @@ library MyToollibrary initializer setorigin
             call SetUnitTimeScalePercent(u,600)
             call SaveInteger(Hash, GetHandleId(u),InvincibleSlash_t, d)
             call d.InvincibleSlash()
+        endmethod
+
+        //新剑
+        static method NewSword takes nothing returns nothing
+            local timer t = GetExpiredTimer()
+            local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
+            local thistype c
+            local integer i = 0
+            local real Atime = 0.04
+            local real a 
+            if d.ID == 2 and d.Countid <= 0 then
+                call PauseUnit(d.u, false)
+                call d.DestroyAndTimer(t)
+            else
+                if d.ID == 0 then
+                    loop
+                        exitwhen i == 2 or d.ID == 1
+                        set d.CheckID = d.CheckID + 150
+                        if d.CheckID >= 450 then
+                            set d.CheckID = 0
+                        endif
+                        set d.i = d.i + 1
+                        if d.i == 88 then
+                            set d.ID = 1
+                            set d.i = 0
+                        endif 
+                        set d.Countid = d.Countid + 1
+                        set d.AnimationMax[d.Countid] = 1500 + d.CheckID
+                        set d.Animationspeed[d.Countid] = 1200 + d.CheckID
+                        set a =  d.angle +  (d.i * 15)
+                        set d.nextx = d.nx + d.AnimationMax[d.Countid] * Cos(a * bj_DEGTORAD)
+                        set d.nexty = d.ny + d.AnimationMax[d.Countid] * Sin(a * bj_DEGTORAD)
+                        set d.ua = IllusionCreation(GetOwningPlayer(d.u), "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl", d.nextx,d.nexty, 0,150,0,15,-1,100)
+                        call SetUnitFlyHeight(d.ua, d.Animationspeed[d.Countid], 0)
+                        set d.thetime[d.Countid] = (d.i * 15)
+                        set d.AllUnit[d.Countid] = d.ua
+                        set i = i + 1
+                    endloop
+                endif
+                if d.Countid > 0 and d.SignalID == 0 then
+                    set d.angle = d.angle + 5.5
+                    set i = d.Countid
+                    loop
+                        exitwhen i <= 0
+                        set d.ua = d.AllUnit[i]
+                        set a =  d.angle + d.thetime[i]
+                        set d.Animationspeed[i] = d.Animationspeed[i] - 20
+                        set d.AnimationMax[i] = d.AnimationMax[i] - 25
+                        if d.AnimationMax[i] < 0 then
+                            set d.AnimationMax[i] = 0
+                        endif
+                        set d.nextx = d.nx + d.AnimationMax[i] * Cos(a * bj_DEGTORAD)
+                        set d.nexty = d.ny + d.AnimationMax[i] * Sin(a * bj_DEGTORAD)
+                        call SetUnitFlyHeight(d.ua, d.Animationspeed[i], 0)
+                        call SetUnitX(d.ua,d.nextx)
+                        call SetUnitY(d.ua,d.nexty)
+                        if d.AnimationMax[i] <= 0 then
+                            set d.AllUnit[i] = d.AllUnit[d.Countid]
+                            set d.thetime[i] = d.thetime[d.Countid]
+                            set d.AnimationMax[i] = d.AnimationMax[d.Countid]
+                            set d.Animationspeed[i] = d.Animationspeed[d.Countid]
+                            set d.Countid = d.Countid - 1
+                            call KillUnit(d.ua)
+                        endif
+                        set i = i - 1
+                    endloop
+                endif
+                if d.ID == 1 and d.Countid == 0 then
+                    set d.ID = 2
+                    set i = 0
+                    call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_heilongzhan.mdx",d.nx,d.ny))
+                    loop 
+                        exitwhen i == 12
+                        set a = i * 30
+                        set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg1.mdx", d.nx,d.ny,a,400,0,15,-1,100)
+                        call SetUnitUserData(d.ua,50)
+                        call Projectile.SetMove(d.ua,2200,15,0.5,180,a,0,0,"",-1,'A020',d.u,d.cb)
+                        set i = i + 1
+                    endloop
+                endif
+            endif
+            set t = null
+        endmethod
+
+        //启动新剑
+        static method StarNewSword takes unit u, real x,real y,ProjectileBack cb returns nothing
+            local thistype d = thistype.allocate()
+            local thistype c = thistype.allocate()
+            set d.cb = cb
+            set d.u = u
+            set d.x = x
+            set d.y = y
+            set d.nx = GetUnitX(d.u)
+            set d.ny = GetUnitY(d.u)
+            set d.angle = GetAngleBetween(GetUnitX(d.u),GetUnitY(d.u),x,y)
+            set d.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(d.t),0, d)
+            call TimerStart(d.t, 0.02, true, function thistype.NewSword)
+            call PauseUnit(d.u, true)
+            set c.u = d.u
+            set c.Animationspeed[1] = 100
+            set c.AnimationID[1] = 12
+            set c.Animationspeed[2] = 50
+            set c.AnimationID[2] = 12 
+            set c.Animationspeed[3] = 100
+            set c.AnimationID[3] = 0
+            set c.thetime[1] = 0.1
+            set c.thetime[2] = 4
+            set c.thetime[3] = 0.1
+            set c.max = 3
+            set c.t = CreateTimer()
+            call SaveInteger(Hash, GetHandleId(c.t),0, c)
+            call TimerStart(c.t, 0.01, false, function thistype.next)
         endmethod
 
     endstruct
