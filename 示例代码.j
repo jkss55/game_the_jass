@@ -68,3 +68,13 @@ function GetInvincibleSlash takes unit hero, unit u, integer ID, real x, real y 
         call BJDebugMsg("移动斩击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
     endif
 endfunction
+
+
+//启动新剑
+call Skill.StarNewSword(GetTriggerUnit(),GetOrderPointX(), GetOrderPointY(),ProjectileBack.GetNewSword)
+//新剑敌人捕获______________________________
+function GetNewSword takes unit hero, unit u, integer ID, real x, real y returns nothing 
+    if ID == 'A020' then
+        call BJDebugMsg("新剑击中敌人名称为："+GetUnitName(u)+"击中来源为："+GetUnitName(hero))
+    endif
+endfunction
