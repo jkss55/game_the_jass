@@ -686,12 +686,12 @@ library MyToollibrary initializer setorigin
         endmethod
 
         //创建单位的函数 
-        static method IllusionCreation takes player p , string s, real x ,real y ,real a,real Size, real transparency, real Duration,integer Animation,real AnimationSpeed  returns unit
-            local unit u = CreateUnit(p,'ewsp',x,y,a)
-            call DzSetUnitModel( u, s )
+        static method IllusionCreation takes player Players , string Model, real x ,real y ,real angle,real Size, real Alpha, real lifeTime,integer Animation,real AnimationSpeed  returns unit
+            local unit u = CreateUnit(Players,'ewsp',x,y,angle)
+            call DzSetUnitModel( u, Model )
             call SetUnitScalePercent( u, Size, Size, Size )
-            call SetUnitVertexColorBJ( u, 100, 100, 100, transparency )
-            call UnitApplyTimedLife( u, 'BHwe', Duration )
+            call SetUnitVertexColorBJ( u, 100, 100, 100, Alpha )
+            call UnitApplyTimedLife( u, 'BHwe', lifeTime )
             if Animation != -1 then
                 call SetUnitAnimationByIndex( u, Animation )
             endif
@@ -2147,7 +2147,7 @@ library MyToollibrary initializer setorigin
                     call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_zj_hl.mdx",ox,oy))
                     call SetUnitFlyHeight(ua, 100, 0)
                     call Projectile.SetMove(u,GetDistance(ox,oy,x,y) * r,75,0.5,120,GetAngleBetween(ox,oy,x,y),0,0,"",-1,'A019',u,cb)
-                    set ua = IllusionCreation(GetOwningPlayer(u), "dw_shenjianzunzhu.mdl", ox,oy, angle,200,40,20,9,25)
+                    set ua = IllusionCreation(GetOwningPlayer(u), "dw_shenjianzunzhu.mdl", ox,oy, angle,100,50,20,9,25)
                     set Countid = Countid + 1
                     set AllUnit[Countid] = ua
                 else
