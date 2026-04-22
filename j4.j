@@ -2147,7 +2147,7 @@ library MyToollibrary initializer setorigin
                     call DestroyEffect(AddSpecialEffect("war3mapimported\\buff_zj_hl.mdx",ox,oy))
                     call SetUnitFlyHeight(ua, 100, 0)
                     call Projectile.SetMove(u,GetDistance(ox,oy,x,y) * r,75,0.5,120,GetAngleBetween(ox,oy,x,y),0,0,"",-1,'A019',u,cb)
-                    set ua = IllusionCreation(GetOwningPlayer(u), "dw_shenjianzunzhu.mdl", ox,oy, angle,100,50,20,9,25)
+                    set ua = IllusionCreation(GetOwningPlayer(u), "dw_shenjianzunzhu.mdl", ox,oy, angle,200,40,20,9,25)
                     set Countid = Countid + 1
                     set AllUnit[Countid] = ua
                 else
