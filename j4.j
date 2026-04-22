@@ -2148,6 +2148,8 @@ library MyToollibrary initializer setorigin
                     call SetUnitFlyHeight(ua, 100, 0)
                     call Projectile.SetMove(u,GetDistance(ox,oy,x,y) * r,75,0.5,120,GetAngleBetween(ox,oy,x,y),0,0,"",-1,'A019',u,cb)
                     set ua = IllusionCreation(GetOwningPlayer(u), "dw_shenjianzunzhu.mdl", ox,oy, angle,100,50,20,9,25)
+                    call SetUnitScale(ua,2,2,2)
+                    call SetUnitVertexColor(ua,255,255,255,100)
                     set Countid = Countid + 1
                     set AllUnit[Countid] = ua
                 else
