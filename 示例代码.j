@@ -40,7 +40,8 @@ endfunction
 
 
 //启动很多剑
-call Skill.StarManySwords(GetTriggerUnit(),GetOrderPointX(), GetOrderPointY(),ProjectileBack.GetManySwords)
+//新增距离修改，负数为减少
+call Skill.StarManySwords(GetTriggerUnit(),GetOrderPointX(), GetOrderPointY(),-200,ProjectileBack.GetManySwords)
 //很多剑敌人捕获______________________________
 function GetManySwords takes unit hero, unit u, integer ID, real x, real y returns nothing 
     if ID == 'A017' then
