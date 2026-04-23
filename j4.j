@@ -1886,6 +1886,7 @@ library MyToollibrary initializer setorigin
             call SaveInteger(Hash, GetHandleId(d.t),0, d)
             call TimerStart(d.t, 0.2, true, function thistype.spikes)
             call PauseUnit( d.u, true)
+            call SetUnitFacing(d.u,d.angle)
             set c.u = d.u
             set c.Animationspeed[1] = 150
             set c.AnimationID[1] = 2
@@ -1929,7 +1930,7 @@ library MyToollibrary initializer setorigin
                         set d.i = 0
                         set d.ID = 1
                     endif 
-                    set r = GetRandomReal(600,1000)
+                    set r = GetRandomReal(600,1000) + d.distance
                     set Atime = 0.06
                     set a =  d.angle +  (d.i * 15)
                     set d.nextx = x + 200 * Cos(a * bj_DEGTORAD)
@@ -1970,7 +1971,7 @@ library MyToollibrary initializer setorigin
                         set i = i + 1
                         set a = d.angle + (i * 15)
                         set d.ua = d.AllUnit[i]
-                        call Projectile.SetMove(d.ua,1000,20,0.5,80,a,0,0,"",-1,'A017',d.u,d.cb)
+                        call Projectile.SetMove(d.ua,1000+d.distance,20,0.5,80,a,0,0,"",-1,'A017',d.u,d.cb)
                     endloop
                 endif
                 if  d.ID == 3 then
@@ -1987,8 +1988,8 @@ library MyToollibrary initializer setorigin
                             set i = i + 1
                             set a = d.angle + d.thetime[i]
                             set d.ua = d.AllUnit[i]
-                            set d.nextx = x + 1200 * Cos(a * bj_DEGTORAD)
-                            set d.nexty = y + 1200 * Sin(a * bj_DEGTORAD)
+                            set d.nextx = x + (d.distance + 1200) * Cos(a * bj_DEGTORAD)
+                            set d.nexty = y + (d.distance + 1200 )* Sin(a * bj_DEGTORAD)
                             call SetUnitX(d.ua,d.nextx)
                             call SetUnitY(d.ua,d.nexty)
                             call SetUnitFacing(d.ua,a-180)
@@ -2009,7 +2010,7 @@ library MyToollibrary initializer setorigin
                             set d.ID = 3
                         endif 
                         call SetUnitUserData(d.ua,50)
-                        call Projectile.SetMove(d.ua,1000,30,0.5,80,GetAngleBetween(GetUnitX(d.ua),GetUnitY(d.ua),x,y),0,0,"",-1,'A017',d.u,d.cb)
+                        call Projectile.SetMove(d.ua,d.distance+1000,30,0.5,80,GetAngleBetween(GetUnitX(d.ua),GetUnitY(d.ua),x,y),0,0,"",-1,'A017',d.u,d.cb)
                         set d.AllUnit[Ri] = d.AllUnit[d.Countid]
                         set d.thetime[Ri] = d.thetime[d.Countid]
                         set d.Countid = d.Countid - 1
@@ -2021,13 +2022,14 @@ library MyToollibrary initializer setorigin
         endmethod
 
         //启动很多剑
-        static method StarManySwords takes unit u, real x,real y,ProjectileBack cb returns nothing
+        static method StarManySwords takes unit u, real x,real y,real distance,ProjectileBack cb returns nothing
             local thistype d = thistype.allocate()
             local thistype c = thistype.allocate()
             set d.cb = cb
             set d.u = u
             set d.x = x
             set d.y = y
+            set d.distance = distance
             set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_heilonghuanrao_gh.mdx", GetUnitX(d.u),GetUnitY(d.u), 0,650,50,15,-1,100)
             set d.angle = GetAngleBetween(GetUnitX(d.u),GetUnitY(d.u),x,y)
             set d.t = CreateTimer()
@@ -2047,31 +2049,39 @@ library MyToollibrary initializer setorigin
         static method GreatSword takes nothing returns nothing
             local timer t = GetExpiredTimer()
             local thistype d = LoadInteger(Hash, GetHandleId(t), 0)
-            local real R = 150 + (d.i*50)
+            local real R = 150 + ((d.i-4)*50)
             local real loopAngle
             local real sideAngle
             local real x = GetUnitX(d.u)
             local real y = GetUnitY(d.u)
             local real i = 0
-            if d.i >= 4 then
+            if d.i >= 8 then
                 set d.i = 0
+                call KillUnit(d.ub)
+                call PauseUnit(d.u, false)
                 call d.DestroyAndTimer(t)
             else
-                loop
-                    exitwhen i >= 360
-                    set loopAngle = i * bj_DEGTORAD
-                    set d.z = R * Sin(loopAngle)
-                    set sideAngle = (d.angle + 90.0) * bj_DEGTORAD
-                    set d.nextx = x + R * Cos(loopAngle) * Cos(sideAngle)
-                    set d.nexty = y + R * Cos(loopAngle) * Sin(sideAngle)
-                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_anyinjian.mdl", d.nextx,d.nexty, d.angle,150,0,15,-1,100)
-                    call SetUnitUserData(d.ua,50)
-                    call Projectile.SetMove(d.ua,2000,25,0.5,100,d.angle,0,0,"",-1,'A018',d.u,d.cb)
-                    call SetUnitFlyHeight(d.ua, 400 + d.z , 0)
-                    //set d.Countid = d.Countid + 1
-                    //set d.AllUnit[d.Countid] = d.ua
-                    set i = i + (360/22.5)
-                endloop
+                if d.i >= 4 then
+                    loop
+                        exitwhen i >= 360
+                        set loopAngle = i * bj_DEGTORAD
+                        set d.z = R * Sin(loopAngle)
+                        set sideAngle = (d.angle + 90.0) * bj_DEGTORAD
+                        set d.nextx = x + R * Cos(loopAngle) * Cos(sideAngle)
+                        set d.nexty = y + R * Cos(loopAngle) * Sin(sideAngle)
+                        set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_anyinjian.mdl", d.nextx,d.nexty, d.angle,150,0,15,-1,100)
+                        call SetUnitUserData(d.ua,50)
+                        if i > 271.0 and i < 273.0 then
+                            call Projectile.SetMove(d.ua,2000,25,0.5,300+((d.i-4)*50),d.angle,0,0,"",-1,'A018',d.u,d.cb)
+                        else
+                            call Projectile.SetMove(d.ua,2000,25,0,0,d.angle,0,0,"",-1,'A018',null,0)
+                        endif
+                        call SetUnitFlyHeight(d.ua, 400 + d.z , 0)
+                        //set d.Countid = d.Countid + 1
+                        //set d.AllUnit[d.Countid] = d.ua
+                        set i = i + (360/22.5)
+                    endloop
+                endif
                 set d.i = d.i + 1
             endif
             set t = null
@@ -2089,14 +2099,20 @@ library MyToollibrary initializer setorigin
             set d.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(d.t),0, d)
             call TimerStart(d.t, 0.3, true, function thistype.GreatSword)
+            set d.ub = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_ghheian.mdx", GetUnitX(d.u),GetUnitY(d.u), d.angle,200,100,8,6,-50)
+            call PauseUnit(u, true)
+            call SetUnitFacing(d.u,d.angle)
             set c.u = d.u
-            set c.Animationspeed[1] = 150
-            set c.AnimationID[1] = 7
-            set c.thetime[1] = 0.5
-            set c.max = 1
+            set c.Animationspeed[1] = 100
+            set c.AnimationID[1] = 16
+            set c.Animationspeed[2] = 100
+            set c.AnimationID[2] = 0
+            set c.thetime[1] = 1.6
+            set c.thetime[2] = 0.1
+            set c.max = 2
             set c.t = CreateTimer()
             call SaveInteger(Hash, GetHandleId(c.t),0, c)
-            call TimerStart(c.t, 0.1, false, function thistype.next)
+            call TimerStart(c.t, 0.04, false, function thistype.next)
         endmethod
 
         //移动斩 
