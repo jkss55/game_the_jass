@@ -2250,7 +2250,7 @@ library MyToollibrary initializer setorigin
                         set a = i * 30
                         set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg1.mdx", d.nx,d.ny,a,400,0,15,-1,100)
                         call SetUnitUserData(d.ua,50)
-                        call Projectile.SetMove(d.ua,2200,15,0.5,180,a,0,0,"",-1,'A020',d.u,d.cb)
+                        call Projectile.SetMove(d.ua,4000,15,0.5,180,a,0,0,"",-1,'A020',d.u,d.cb)
                         set i = i + 1
                     endloop
                 endif
