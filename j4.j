@@ -2205,29 +2205,26 @@ library MyToollibrary initializer setorigin
                 call d.DestroyAndTimer(t)
             else
                 if d.ID == 0 then
-                    loop
-                        exitwhen i == 2 or d.ID == 1
-                        set d.CheckID = d.CheckID + 150
-                        if d.CheckID >= 450 then
-                            set d.CheckID = 0
-                        endif
-                        set d.i = d.i + 1
-                        if d.i == 88 then
-                            set d.ID = 1
-                            set d.i = 0
-                        endif 
-                        set d.Countid = d.Countid + 1
-                        set d.AnimationMax[d.Countid] = 1500 + d.CheckID
-                        set d.Animationspeed[d.Countid] = 1200 + d.CheckID
-                        set a =  d.angle +  (d.i * 15)
-                        set d.nextx = d.nx + d.AnimationMax[d.Countid] * Cos(a * bj_DEGTORAD)
-                        set d.nexty = d.ny + d.AnimationMax[d.Countid] * Sin(a * bj_DEGTORAD)
-                        set d.ua = IllusionCreation(GetOwningPlayer(d.u), "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl", d.nextx,d.nexty, 0,150,0,15,-1,100)
-                        call SetUnitFlyHeight(d.ua, d.Animationspeed[d.Countid], 0)
-                        set d.thetime[d.Countid] = (d.i * 15)
-                        set d.AllUnit[d.Countid] = d.ua
-                        set i = i + 1
-                    endloop
+                    set d.CheckID = d.CheckID + 150
+                    if d.CheckID >= 450 then
+                        set d.CheckID = 0
+                    endif
+                    set d.i = d.i + 1
+                    if d.i == 16 then
+                        set d.ID = 1
+                        set d.i = 0
+                    endif 
+                    set d.Countid = d.Countid + 1
+                    set d.AnimationMax[d.Countid] = 1500 + d.CheckID
+                    set d.Animationspeed[d.Countid] = 1200 + d.CheckID
+                    set a =  d.angle +  (d.i * 15)
+                    set d.nextx = d.nx + d.AnimationMax[d.Countid] * Cos(a * bj_DEGTORAD)
+                    set d.nexty = d.ny + d.AnimationMax[d.Countid] * Sin(a * bj_DEGTORAD)
+                    set d.ua = IllusionCreation(GetOwningPlayer(d.u), "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl", d.nextx,d.nexty, 0,150,0,15,-1,100)
+                    call SetUnitFlyHeight(d.ua, d.Animationspeed[d.Countid], 0)
+                    set d.thetime[d.Countid] = (d.i * 15)
+                    set d.AllUnit[d.Countid] = d.ua
+                    set i = i + 1
                 endif
                 if d.Countid > 0 and d.SignalID == 0 then
                     set d.angle = d.angle + 5.5
@@ -2266,7 +2263,7 @@ library MyToollibrary initializer setorigin
                         set a = i * 30
                         set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_dg1.mdx", d.nx,d.ny,a,400,0,15,-1,100)
                         call SetUnitUserData(d.ua,50)
-                        call Projectile.SetMove(d.ua,4000,15,0.5,180,a,0,0,"",-1,'A020',d.u,d.cb)
+                        call Projectile.SetMove(d.ua,2200,15,0.5,180,a,0,0,"",-1,'A020',d.u,d.cb)
                         set i = i + 1
                     endloop
                 endif
@@ -2345,3 +2342,4 @@ library MyToollibrary initializer setorigin
     endfunction
 endlibrary
 
+   
