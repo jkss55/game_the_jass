@@ -2055,6 +2055,7 @@ library MyToollibrary initializer setorigin
             local real x = GetUnitX(d.u)
             local real y = GetUnitY(d.u)
             local real i = 0
+            local real step = 360 / 10 //10代表剑的数量
             if d.i >= 8 then
                 set d.i = 0
                 call KillUnit(d.ub)
@@ -2071,7 +2072,7 @@ library MyToollibrary initializer setorigin
                         set d.nexty = y + R * Cos(loopAngle) * Sin(sideAngle)
                         set d.ua = IllusionCreation(GetOwningPlayer(d.u), "war3mapimported\\buff_anyinjian.mdl", d.nextx,d.nexty, d.angle,150,0,15,-1,100)
                         call SetUnitUserData(d.ua,50)
-                        if i > 271.0 and i < 273.0 then
+                        if i > 270.0 - (step / 2.0) and i <= 270.0 + (step / 2.0) then
                             call Projectile.SetMove(d.ua,2000,25,0.5,300+((d.i-4)*50),d.angle,0,0,"",-1,'A018',d.u,d.cb)
                         else
                             call Projectile.SetMove(d.ua,2000,25,0,0,d.angle,0,0,"",-1,'A018',null,0)
@@ -2079,7 +2080,7 @@ library MyToollibrary initializer setorigin
                         call SetUnitFlyHeight(d.ua, 400 + d.z , 0)
                         //set d.Countid = d.Countid + 1
                         //set d.AllUnit[d.Countid] = d.ua
-                        set i = i + (360/22.5)
+                        set i = i + step
                     endloop
                 endif
                 set d.i = d.i + 1
